@@ -36,6 +36,7 @@ daqiri:
   cfg:
     version: 1
     stream_type: "raw"
+    engine: "dpdk"
     master_core: 9  # Master CPU core
     debug: false
     log_level: "info"

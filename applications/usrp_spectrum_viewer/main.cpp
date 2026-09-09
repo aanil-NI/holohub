@@ -13,6 +13,7 @@
 #include <fft.hpp>
 #include <holoscan/operators/holoviz/holoviz.hpp>
 #include <daqiri/daqiri.h>
+#include <yaml-cpp/yaml.h>
 #include <filesystem>
 #include <memory>
 #include <stdexcept>
@@ -73,8 +74,15 @@ class UsrpSpectrumViewerApp : public holoscan::Application {
 
         const bool usrp_enabled = from_config("usrp_rx.enabled").as<bool>();
         if (usrp_enabled) {
-            const auto usrp_channels =
-                from_config("usrp_rx.channels").as<std::vector<int64_t>>();
+            // Read usrp_rx.channels from the raw node.
+            std::vector<int64_t> usrp_channels;
+            for (const auto& node : config().yaml_nodes()) {
+                if (node.IsMap() && node["usrp_rx"] && node["usrp_rx"]["channels"]) {
+                    usrp_channels =
+                        node["usrp_rx"]["channels"].as<std::vector<int64_t>>();
+                    break;
+                }
+            }
             if (static_cast<int64_t>(usrp_channels.size()) != rx_channels) {
                 throw std::runtime_error(fmt::format(
                     "usrp_rx.channels has {} entries but the pipeline is configured for {} "

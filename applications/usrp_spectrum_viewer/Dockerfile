@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 National Instruments Corporation
 #
 # SPDX-License-Identifier: Apache-2.0
-ARG NETWORKING_BASE_IMAGE=holohub-networking:4.5.0
+ARG NETWORKING_BASE_IMAGE=holohub-networking:4.6.0
 FROM ${NETWORKING_BASE_IMAGE}
 
 ARG UHD_GIT_REF=v4.10.0.0

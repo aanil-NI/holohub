@@ -285,8 +285,8 @@ From the Holohub workspace root:
 1. Build the networking dev container:
 
    ```bash
-   ./holohub build-container --docker-file pkg/holoscan-networking/Dockerfile --img holohub-networking:4.5.0 --dryrun --verbose
-   ./holohub build-container --docker-file pkg/holoscan-networking/Dockerfile --img holohub-networking:4.5.0 --verbose
+   ./holohub build-container --docker-file pkg/holoscan-networking/Dockerfile --img holohub-networking:4.6.0 --dryrun --verbose
+   ./holohub build-container --docker-file pkg/holoscan-networking/Dockerfile --img holohub-networking:4.6.0 --verbose
    ```
 
 2. Build the application:
@@ -299,8 +299,8 @@ From the Holohub workspace root:
 3. Run the application:
 
    ```bash
-   ./holohub run usrp_spectrum_viewer --docker-opts "-u root --privileged -v /mnt/huge:/mnt/huge" --dryrun --verbose
-   ./holohub run usrp_spectrum_viewer --docker-opts "-u root --privileged -v /mnt/huge:/mnt/huge" --verbose
+   ./holohub run usrp_spectrum_viewer --docker-opts "-u root --privileged -v /mnt/huge:/mnt/huge --cpuset-cpus=0-11" --dryrun --verbose
+   ./holohub run usrp_spectrum_viewer --docker-opts "-u root --privileged -v /mnt/huge:/mnt/huge --cpuset-cpus=0-11" --verbose
    ```
 
 ## Troubleshooting
