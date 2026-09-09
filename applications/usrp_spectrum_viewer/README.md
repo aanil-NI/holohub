@@ -93,6 +93,9 @@ The operator-specific options and their meaning are documented in each folder-le
 The `usrp_rx` section configures the control-plane connection to the radio. When `enabled` is `true`, `UsrpRxOp` opens the device identified by `args`, configures the sample rate, RF center frequency, and gain for every selected channel, and starts one UHD receive streamer per channel. Each streamer sends its UDP/CHDR packets to the
 matching `dest_ports` entry on `dest_addr`, `channels` and `dest_ports` must have the same number of entries. Their positions form the mapping between a radio channel and a DAQIRI receive queue; for example, channel 0 uses port 1234 and channel 1 uses port 1235 below.
 
+> [!NOTE]
+> The `CH0`/`CH1` labels in the Holoviz legend, the peak readout, and the `LogOp` throughput lines identify the **DAQIRI receive queue**, not the radio channel index. This is the only identifier that is always defined, because `usrp_rx` is optional and the application can also attach to an externally started streamer. Which radio channel appears as `CHn` is decided by your configuration: `usrp_rx.channels[i]` streams to `usrp_rx.dest_ports[i]`, that port is matched by a `daqiri.cfg.interfaces[].rx.flows[]` entry, and the flow's `action.id` selects the queue. With the shipped configuration this chain is the identity mapping. If you stream a non-identity channel list — for example `channels: [1]` or `channels: [2, 0]` — the traces are still correct, but `CHn` will not match the physical radio channel number.
+
 > [!IMPORTANT]
 > `enabled` defaults to `false` so the application never tries to open a radio with the placeholder addresses shipped in `config.yaml`. Replace the placeholder `args`, `dest_addr`, and `dest_mac_addr` values with your hardware's settings, then set `enabled: true` to start in-app USRP control.
 >

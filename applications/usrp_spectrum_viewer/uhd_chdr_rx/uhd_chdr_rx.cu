@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 #include "uhd_chdr_rx.hpp"
 
+#include <algorithm>
 #include <cstring>
 #include <iomanip>
 #include <sstream>
@@ -432,7 +433,11 @@ void UhdChdrRxOp::process_channel_data(BurstParams* burst, uint16_t channel_num)
                       data.Size(0),
                       data.Size(1));
     set_print_format_type(MATX_PRINT_FORMAT_PYTHON);
-    print(slice<1>(data, {0, 0}, {matxDropDim, 1024}));
+    // Dump at most the first 1024 samples, but never past the configured
+    // row width (num_packets_per_output * num_complex_samples_per_packet).
+    constexpr index_t max_logged_samples = 1024;
+    print(slice<1>(data, {0, 0},
+                   {matxDropDim, std::min(max_logged_samples, data.Size(1))}));
   }
 
   const auto completed_event = channel->events[channel->cur_idx];
