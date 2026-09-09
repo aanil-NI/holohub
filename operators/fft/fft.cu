@@ -79,7 +79,8 @@ void FFT::setup(OperatorSpec& spec) {
 void FFT::initialize() {
     holoscan::Operator::initialize();
     if (burst_size.get() <= 0 || num_bursts.get() <= 0 || num_channels.get() == 0) {
-        throw std::runtime_error("fft.burst_size, num_bursts, and num_channels must all be > 0");
+        throw std::runtime_error(
+            "fft.burst_size, fft.num_bursts, and fft.num_channels must all be > 0");
     }
 }
 

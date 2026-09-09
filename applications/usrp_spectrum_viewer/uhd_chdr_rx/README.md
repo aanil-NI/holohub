@@ -3,7 +3,7 @@
 
 ## Overview
 
-An operator to receive data packets streamed from USRP's (CHDR packets) and converts them into batched complex-sample tensors for downstream processing.
+An operator that receives data packets streamed from USRPs (CHDR packets) and converts them into batched complex-sample tensors for downstream processing.
 
 ## Description
 

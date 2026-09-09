@@ -73,6 +73,8 @@ uint16_t decode_chdr_sequence(const void* header) {
 
   // MPMD/X4xx transports CHDR in little-endian order. Let UHD decode the
   // current RFNoC header layout instead of duplicating its field offsets.
+  // The RFNoC data-plane SeqNum field is 16 bits wide (chdr_header::
+  // SEQ_NUM_WIDTH), so uint16_t arithmetic wraps exactly like the wire field.
   const uhd::rfnoc::chdr::chdr_header chdr_header{
       uhd::wtohx<uint64_t>(wire_header)};
   return chdr_header.get_seq_num();
@@ -174,6 +176,9 @@ void UhdChdrRxOp::initialize() {
       check_cuda(cudaStreamCreateWithFlags(&channel->stream, cudaStreamNonBlocking),
                  "cudaStreamCreateWithFlags");
 
+      // Under unified virtual addressing the pinned pointer list is directly
+      // dereferenceable from device code, so place_packet_data_kernel can read
+      // it without staging a device copy.
       for (size_t slot = 0; slot < num_buffered_batches_.get(); ++slot) {
         check_cuda(cudaMallocHost(reinterpret_cast<void**>(&channel->h_dev_ptrs[slot]),
                                   sizeof(void*) * num_packets_per_batch_),
@@ -417,6 +422,10 @@ void UhdChdrRxOp::process_channel_data(BurstParams* burst, uint16_t channel_num)
   check_cuda(cudaGetLastError(), "place_packet_data kernel launch");
 
   if (log_data_.get()) {
+    // MatX print() stages its copy on the default stream, which does not
+    // synchronize with this non-blocking stream. Wait for the conversion kernel
+    // so the dump cannot show partially written samples.
+    check_cuda(cudaStreamSynchronize(channel->stream), "cudaStreamSynchronize");
     HOLOSCAN_LOG_INFO("Inspecting RF channel {} data from slot {} with shape: ({}, {})",
                       channel->channel_num,
                       channel->cur_idx,

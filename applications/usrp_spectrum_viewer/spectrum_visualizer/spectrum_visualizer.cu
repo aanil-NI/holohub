@@ -216,6 +216,10 @@ void SpectrumVisualizerOp::compute(InputContext& op_input,
   }
 
   // All GPU work runs on one managed stream; make it wait for the upstream
+  // producer. A single pair of reusable events is safe here: cudaStreamWaitEvent
+  // binds to the most recent host-side cudaEventRecord, and compute() is never
+  // re-entered for the same operator, so a later record cannot retarget a wait
+  // that was already issued.
   cudaStream_t op_stream = op_input.receive_cuda_stream("in");
   check_cuda(cudaEventRecord(input_ready_event_, in_stream), "cudaEventRecord");
   check_cuda(cudaStreamWaitEvent(op_stream, input_ready_event_, 0), "cudaStreamWaitEvent");

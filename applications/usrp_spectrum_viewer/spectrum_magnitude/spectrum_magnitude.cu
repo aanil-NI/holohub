@@ -37,20 +37,21 @@ void SpectrumMagnitudeOp::setup(OperatorSpec& spec) {
 void SpectrumMagnitudeOp::initialize() {
     holoscan::Operator::initialize();
 
-     const int burst_size = burst_size_.get();
-     const int num_bursts = num_bursts_.get();
-     const auto num_channels = num_channels_.get();
-     const auto num_averages = num_averages_.get();
-     if (burst_size <= 0 || num_bursts <= 0 || num_channels == 0 || num_averages == 0) {
-         throw std::runtime_error(
-             "spectrum_magnitude.burst_size, num_bursts, num_channels, and num_averages must all "
-             "be > 0");
-     }
-     if (num_averages != static_cast<uint32_t>(num_bursts)) {
-         throw std::runtime_error(
-             "spectrum_magnitude.num_averages must equal num_bursts; the batch is averaged over "
-             "all num_bursts rows");
-     }
+    const int burst_size = burst_size_.get();
+    const int num_bursts = num_bursts_.get();
+    const auto num_channels = num_channels_.get();
+    const auto num_averages = num_averages_.get();
+    if (burst_size <= 0 || num_bursts <= 0 || num_channels == 0 || num_averages == 0) {
+        throw std::runtime_error(
+            "spectrum_magnitude.burst_size, spectrum_magnitude.num_bursts, "
+            "spectrum_magnitude.num_channels, and spectrum_magnitude.num_averages must all "
+            "be > 0");
+    }
+    if (num_averages != static_cast<uint32_t>(num_bursts)) {
+        throw std::runtime_error(
+            "spectrum_magnitude.num_averages must equal spectrum_magnitude.num_bursts; the "
+            "batch is averaged over all num_bursts rows");
+    }
     scale_factor_ = 1.0f / (static_cast<float>(burst_size) * static_cast<float>(burst_size));
 }
 

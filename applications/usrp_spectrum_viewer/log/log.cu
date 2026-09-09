@@ -41,6 +41,7 @@ void LogOp::compute(InputContext& op_input,
   // Receive input tensor and CUDA stream
   auto input = op_input.receive<in_t>("in").value();
   auto tensor = std::get<0>(input);
+  auto stream = std::get<1>(input);
 
   // Access metadata
   auto meta = metadata();
@@ -84,6 +85,15 @@ void LogOp::compute(InputContext& op_input,
 
   // Log data for debugging
   if (log_data_.get()) {
+    // MatX print() stages its copy on the default stream, which does not
+    // synchronize with the upstream non-blocking stream. Wait for the producer
+    // so the dump cannot show partially written samples.
+    const auto sync_result = cudaStreamSynchronize(stream);
+    if (sync_result != cudaSuccess) {
+      HOLOSCAN_LOG_ERROR("cudaStreamSynchronize failed before logging channel {}: {}",
+          channel_num, cudaGetErrorString(sync_result));
+      return;
+    }
     HOLOSCAN_LOG_INFO("Received tensor from channel {} with rank {} and shape: ({}, {})",
         channel_num, tensor.Rank(), tensor.Size(0), tensor.Size(1));
     HOLOSCAN_LOG_INFO("Every 20th sample of the first burst of channel {}:", channel_num);

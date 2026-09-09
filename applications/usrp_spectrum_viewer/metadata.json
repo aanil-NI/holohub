@@ -30,7 +30,7 @@
         },
         "platforms": ["x86_64", "aarch64"],
         "tags": ["Signal Processing", "USRP", "SDR", "DPDK", "HOLOVIZ"],
-	 "dockerfile": "applications/usrp_spectrum_viewer/Dockerfile",
+        "dockerfile": "applications/usrp_spectrum_viewer/Dockerfile",
         "ranking": 3,
         "requirements": {
             "operators": [
